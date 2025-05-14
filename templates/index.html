@@ -28,12 +28,21 @@
   <main class="container mx-auto px-4 py-10">
     <section class="bg-white shadow-lg rounded-lg p-8">
       <h2 class="text-2xl font-semibold mb-4 text-blue-700">📝 Current Situation</h2>
-      <p id="situation" class="text-lg text-gray-700 mb-6">Loading baby status...</p>
-
-      <h3 class="text-xl font-semibold mb-4 text-blue-700">💡 Recommendation</h3>
+      <p id="situation" class="text-lg text-gray-700 mb-6">Loading baby status...</p>      <h3 class="text-xl font-semibold mb-4 text-blue-700">💡 Recommendation</h3>
       <p id="advice" class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded shadow-sm text-gray-700">
         Loading advice...
       </p>
+
+      <!-- Test Controls (for development only) -->
+      <div class="mt-8 p-4 border-t border-gray-200">
+        <h4 class="text-lg font-semibold text-gray-700 mb-2">Test Controls</h4>
+        <button 
+          id="testButton" 
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onclick="sendTestUpdate()">
+          Simulate Baby Status Update
+        </button>
+      </div>
     </section>
   </main>
 
@@ -42,43 +51,38 @@
   </footer>
   <!-- Socket.IO library -->
   <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
-  
   <script>
-    // Connect to Socket.IO server
-    const socket = io();
-    let lastUpdated = new Date();
-    
-    // Listen for status updates from server
-    socket.on('status_update', (data) => {
-      console.log('Received new baby status:', data);
-      displayStatus(data);
-      lastUpdated = new Date();
-      
-      // Show notification if supported
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('BabyCry Update', {
-          body: `Baby status: ${data.status}`
-        });
+    // Dummy data for testing
+    const dummyResponses = [
+      {
+        situation: "Baby is crying with high intensity",
+        status: "Crying",
+        recommendation: "The baby might be hungry. Consider feeding time."
+      },
+      {
+        situation: "Baby is making soft cooing sounds",
+        status: "Happy",
+        recommendation: "Baby seems content. Continue current activity."
+      },
+      {
+        situation: "Baby is crying intermittently",
+        status: "Fussy",
+        recommendation: "Check if the diaper needs changing or if the baby is tired."
       }
-    });
-    
-    // Get initial status when page loads
-    async function fetchInitialStatus() {
-      try {
-        const response = await fetch('/get-latest-status');
-        
-        if (!response.ok) throw new Error('Network response was not ok');
-        
-        const data = await response.json();
-        
-        // Only display if we have data
-        if (data.status) {
-          displayStatus(data);
-        }
-      } catch (error) {
-        document.getElementById('situation').textContent = 'Waiting for baby status updates...';
-        console.error('Fetch error:', error);
-      }
+    ];
+
+    function getRandomDummyResponse() {
+      return dummyResponses[Math.floor(Math.random() * dummyResponses.length)];
+    }
+
+    // Mock Socket.IO connection
+    function initializeMockSocket() {
+      // Simulate receiving updates every 30 seconds
+      setInterval(() => {
+        const dummyData = getRandomDummyResponse();
+        displayStatus(dummyData);
+        console.log('Received new baby status:', dummyData);
+      }, 30000);
     }
 
     function displayStatus(data) {
@@ -100,13 +104,33 @@
       adviceElement.appendChild(timestamp);
     }
     
-    // Request notification permission
-    if ('Notification' in window) {
-      Notification.requestPermission();
+    // Function to send test updates
+    function sendTestUpdate() {
+      const button = document.getElementById('testButton');
+      button.disabled = true;
+      button.textContent = 'Sending...';
+      
+      // Simulate network delay
+      setTimeout(() => {
+        try {
+          const dummyData = getRandomDummyResponse();
+          displayStatus(dummyData);
+          console.log('Test update sent:', dummyData);
+        } catch (error) {
+          console.error('Error sending test update:', error);
+          alert('Error sending test update. Check console for details.');
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Simulate Baby Status Update';
+        }
+      }, 500);
     }
 
-    // Call on load
-    fetchInitialStatus();
+    // Initialize with dummy data
+    window.onload = function() {
+      displayStatus(getRandomDummyResponse());
+      initializeMockSocket();
+    };
   </script>
 </body>
 </html>
