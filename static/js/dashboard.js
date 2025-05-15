@@ -220,19 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         sidebar.style.width = '0';
         sidebar.style.padding = '0';
-      }
-    });
-  }
-          card.style.display = 'none';
-        });
-        chatCard.style.display = 'block';
-      }
-      
-      // Scroll to chat card on desktop
-      chatCard.scrollIntoView({ behavior: 'smooth' });
-      
-      // Focus on chat input
-      chatInput.focus();
-    });
+      }    });
   }
 });
