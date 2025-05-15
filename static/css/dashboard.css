@@ -181,6 +181,8 @@ body {
   color: var(--text-light);
   position: relative;
   padding-left: 2.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .message.typing:after {
@@ -189,16 +191,30 @@ body {
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background-color: var(--primary);
-  animation: typing-animation 1s infinite;
+  animation: typing-bounce 1.4s infinite;
 }
 
-@keyframes typing-animation {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+.message.typing:before {
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  animation: typing-bounce 1.4s infinite;
+  animation-delay: 0.2s;
+}
+
+@keyframes typing-bounce {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
 }
 
 .chat-input {

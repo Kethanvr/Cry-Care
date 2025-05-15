@@ -135,12 +135,31 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           body: JSON.stringify({ message: userMessage })
         });
-        
-        // Remove typing indicator
+          // Remove typing indicator
         chatMessages.removeChild(typingDiv);
         
         if (response.ok) {
           const data = await response.json();
+          
+          // Calculate a realistic typing delay based on response length
+          const responseLength = data.response.length;
+          const baseDelay = 1000; // Minimum delay of 1 second
+          const typingDelay = Math.min(responseLength * 30, 5000) + baseDelay; // Cap at 6 seconds total
+          
+          // Show a new typing indicator with the delay
+          const delayTypingDiv = document.createElement('div');
+          delayTypingDiv.className = 'message bot typing';
+          delayTypingDiv.textContent = 'Typing...';
+          chatMessages.appendChild(delayTypingDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          
+          // Wait for the calculated time
+          await new Promise(resolve => setTimeout(resolve, typingDelay));
+          
+          // Remove the typing indicator
+          chatMessages.removeChild(delayTypingDiv);
+          
+          // Add the bot message
           addMessage(data.response);
         } else {
           throw new Error('Network response was not ok');

@@ -43,21 +43,51 @@ def home():
 def chat_page():
     return render_template('chat.html')
 
+# Store conversation history for each session
+conversation_history = {}
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json()
     message = data.get("message", "").strip()
+    conversation_id = data.get("conversationId", "default")
+    
+    # Initialize or retrieve conversation history
+    if conversation_id not in conversation_history:
+        conversation_history[conversation_id] = []
+    
+    # Add the user message to history
+    conversation_history[conversation_id].append({"role": "user", "message": message})
+    
+    # Keep only the last 10 messages in history to avoid token limits
+    if len(conversation_history[conversation_id]) > 10:
+        conversation_history[conversation_id] = conversation_history[conversation_id][-10:]
     
     try:
-        # Use Gemini to generate a response
+        # Build conversation context from history
+        context = "\n".join([
+            f"{'Assistant' if msg['role'] == 'assistant' else 'User'}: {msg['message']}"
+            for msg in conversation_history[conversation_id]
+        ])
+        
+        # Use Gemini to generate a response with context
         prompt = (
-            f"You are an AI baby care assistant. Your job is to provide helpful, friendly, and nurturing advice to parents.\n"
-            f"The user's message is: '{message}'\n"
-            f"Respond in a warm, supportive tone as if you're an experienced caregiver, but keep your response fairly brief (1-3 sentences)."
+            f"You are an AI baby care assistant named CryCare. Your job is to provide helpful, friendly, and nurturing advice to parents.\n"
+            f"Current date: May 15, 2025\n"
+            f"Previous conversation:\n{context}\n\n"
+            f"Respond to the user's latest message in a warm, supportive tone as if you're an experienced caregiver.\n"
+            f"Keep your response concise (1-3 sentences) but informative. If the user asks about baby cries or developmental milestones, provide specific, age-appropriate guidance."
         )
         
         response = model.generate_content(prompt)
-        return jsonify({"response": response.text})
+        
+        # Add the assistant response to history
+        conversation_history[conversation_id].append({"role": "assistant", "message": response.text})
+        
+        return jsonify({
+            "response": response.text,
+            "conversationId": conversation_id
+        })
     except Exception as e:
         print(f"Error in chat endpoint: {str(e)}")
         return jsonify({"response": "I'm sorry, I couldn't process your request. Please try again."}), 500
