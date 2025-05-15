@@ -29,9 +29,14 @@ def chrome_devtools():
     return jsonify({})
 
 # Route for dashboard page
-@app.route('/')
+@app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+# Route for home page
+@app.route('/')
+def home():
+    return render_template('home.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
