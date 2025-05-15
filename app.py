@@ -38,6 +38,11 @@ def dashboard():
 def home():
     return render_template('home.html')
 
+# Route for chat page
+@app.route('/chat')
+def chat_page():
+    return render_template('chat.html')
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json()

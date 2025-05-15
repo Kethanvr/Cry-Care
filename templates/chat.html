@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryCare - Chat</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <link rel="stylesheet" href="/static/css/chat.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <span class="logo-text">👶 BabyCry</span>
+      </div>
+    </div>
+      <nav class="nav-links">
+      <a href="/" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/dashboard" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="/chat" class="nav-item active">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </aside>
+    <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="flex items-center">
+        <button id="mobile-menu-toggle" class="md:hidden mr-4 text-primary">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1>Baby Care Assistant</h1>
+      </div>
+      <div class="status">
+        <span id="status-indicator" class="status-indicator online"></span>
+        <span>Chat Status</span>
+      </div>
+    </div>
+    
+    <div class="chat-wrapper">
+      <div class="chat-container full-height">
+        <div id="chat-messages" class="chat-messages">
+          <div class="message bot">
+            <div class="message-content">
+              <i class="fas fa-robot message-avatar"></i>
+              <div class="message-text">
+                Hello! I'm your baby care assistant. How can I help you today? Ask me anything about infant care, feeding, sleep, or development.
+              </div>
+            </div>
+            <div class="message-time">Just now</div>
+          </div>
+        </div>
+        
+        <form id="chat-form" class="chat-input">
+          <input 
+            type="text" 
+            id="chat-input" 
+            placeholder="Type your question here..." 
+            autocomplete="off"
+          >
+          <button type="submit">
+            <i class="fas fa-paper-plane"></i> Send
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Socket.IO library -->
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>

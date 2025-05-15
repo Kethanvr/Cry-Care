@@ -16,15 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Test elements
   const testButton = document.getElementById('test-button');
-  
-  // Mobile menu toggle
+    // Mobile menu toggle
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   
-  // Chat navigation functionality
-  const chatNavItem = document.getElementById('chat-nav-item');
-  const dashboardCards = document.querySelector('.dashboard-cards');
-  const chatCard = document.querySelector('.card:nth-child(2)'); // The chat card
-
   // Dummy responses for testing
   const dummyResponses = [
     {
@@ -210,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return "I understand your concern. For more specific advice about your baby, please provide more details about what you're experiencing.";
     }
   }
-  
+    
   // Mobile menu toggle functionality
   if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener('click', function() {
@@ -229,26 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  // Initially hide the chat card on small screens
-  if (window.innerWidth < 768 && chatCard) {
-    chatCard.style.display = 'none';
-  }
-
-  // Chat nav item click event
-  if (chatNavItem) {
-    chatNavItem.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      // Toggle active state on nav items
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      chatNavItem.classList.add('active');
-      
-      // On mobile, show only chat card and hide others
-      if (window.innerWidth < 768) {
-        Array.from(dashboardCards.children).forEach(card => {
           card.style.display = 'none';
         });
         chatCard.style.display = 'block';
