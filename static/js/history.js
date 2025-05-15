@@ -88,24 +88,32 @@ function loadHistoryStats(month) {
   // Show loading state
   document.getElementById('monthly-chart').innerHTML = 'Loading...';
   
-  // Fetch history stats from API
-  fetch(`/get-history-stats?month=${month}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        updateStatsDisplay(data.stats);
-        renderMonthlyChart(data.stats, data.month);
-      } else {
-        console.error('Error loading history stats:', data.error);
-        // Show fallback data
-        renderMonthlyChart();
+  // Create sample data for demonstration
+  const sampleData = {
+    success: true,
+    stats: {
+      total: 58,
+      weeks: {
+        week1: {
+          byType: { hunger: 15, sleepiness: 10, discomfort: 8, other: 5 }
+        },
+        week2: {
+          byType: { hunger: 12, sleepiness: 14, discomfort: 6, other: 4 }
+        },
+        week3: {
+          byType: { hunger: 18, sleepiness: 8, discomfort: 5, other: 6 }
+        },
+        week4: {
+          byType: { hunger: 13, sleepiness: 10, discomfort: 5, other: 4 }
+        }
       }
-    })
-    .catch(error => {
-      console.error('Error fetching history stats:', error);
-      // Show fallback data
-      renderMonthlyChart();
-    });
+    },
+    month: month
+  };
+
+  // Update the display with sample data
+  updateStatsDisplay(sampleData.stats);
+  renderMonthlyChart(sampleData.stats, sampleData.month);
 }
 
 // Update stats display with data from API
