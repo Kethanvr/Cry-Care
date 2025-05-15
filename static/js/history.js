@@ -288,30 +288,53 @@ function exportData() {
   const startDate = document.getElementById('start-date').value;
   const endDate = document.getElementById('end-date').value;
   
-  // In a real app, this would call an API endpoint to generate and download a CSV/Excel file
-  console.log(`Exporting data from ${startDate} to ${endDate}`);
+  // Get current chart data
+  const chartData = window.cryChart.data;
   
-  // Create a fake CSV for demonstration
-  const header = 'Date,Event Type,Description,Time\n';
-  const rows = [
-    '2025-05-15,Hunger,Baby seems hungry and needs feeding,14:45:00',
-    '2025-05-15,Sleepiness,Baby is showing signs of tiredness,12:30:00',
-    '2025-05-15,Discomfort,Baby may need a diaper change,10:15:00',
-    '2025-05-14,Hunger,Baby seems hungry and needs feeding,20:20:00',
-    '2025-05-14,Sleepiness,Baby is showing signs of tiredness,15:45:00'
-  ].join('\n');
+  // Create CSV header
+  const header = 'Week,Hunger,Sleepiness,Discomfort,Other,Total\n';
   
-  const csvContent = header + rows;
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+  // Process chart data into CSV rows
+  const rows = chartData.labels.map((week, index) => {
+    const hunger = chartData.datasets[0].data[index];
+    const sleepiness = chartData.datasets[1].data[index];
+    const discomfort = chartData.datasets[2].data[index];
+    const other = chartData.datasets[3].data[index];
+    const total = hunger + sleepiness + discomfort + other;
+    return `${week},${hunger},${sleepiness},${discomfort},${other},${total}`;
+  }).join('\n');
+  
+  // Add summary row
+  const summary = chartData.datasets.map(dataset => 
+    dataset.data.reduce((sum, val) => sum + val, 0)
+  );
+  const totalSummary = summary.reduce((sum, val) => sum + val, 0);
+  const summaryRow = `\nTotal,${summary[0]},${summary[1]},${summary[2]},${summary[3]},${totalSummary}`;
+  
+  // Get events list
+  const events = document.querySelectorAll('.event-item');
+  const eventsHeader = '\n\nEvent History\nDate,Event Type,Description\n';
+  const eventsData = Array.from(events).map(event => {
+    const type = event.querySelector('.event-title').textContent;
+    const description = event.querySelector('.event-description').textContent;
+    const time = event.querySelector('.event-time').textContent;
+    return `${time},${type},${description}`;
+  }).join('\n');
+    // Combine all data
+  const csvContent = header + rows + summaryRow + eventsHeader + eventsData;
+  
+  // Create and trigger download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  
-  // Create a temporary link and trigger download
   const a = document.createElement('a');
+  const timestamp = new Date().toISOString().slice(0,19).replace(/[:]/g, '-');
+  
   a.href = url;
-  a.download = `cry_history_${startDate}_to_${endDate}.csv`;
+  a.download = `baby_cry_history_${startDate}_to_${endDate}_${timestamp}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Refresh events list
