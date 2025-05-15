@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryCare - Settings</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <link rel="stylesheet" href="/static/css/settings.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <span class="logo-text">👶 BabyCry</span>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="/" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/dashboard" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="/chat" class="nav-item">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+      </a>
+      <a href="/history" class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </a>
+      <a href="/settings" class="nav-item active">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="flex items-center">
+        <button id="mobile-menu-toggle" class="md:hidden mr-4 text-primary">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1>Settings</h1>
+      </div>
+      <div class="status">
+        <span id="status-indicator" class="status-indicator online"></span>
+        <span>Device Status</span>
+      </div>
+    </div>
+
+    <div class="dashboard-cards">
+      <!-- Profile Settings Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Profile Settings</h2>
+          <div class="card-actions">
+            <button id="edit-profile" class="btn-outline">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="profile-info">
+            <div class="profile-avatar">
+              <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=parent" alt="Profile Avatar">
+              <div class="avatar-overlay">
+                <i class="fas fa-camera"></i>
+              </div>
+            </div>
+            <div class="profile-details">
+              <div class="profile-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="Alex Johnson" disabled>
+              </div>
+              <div class="profile-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="alex@example.com" disabled>
+              </div>
+              <div class="profile-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" value="+1 (555) 123-4567" disabled>
+              </div>
+              <div class="profile-group">
+                <label for="baby-name">Baby's Name</label>
+                <input type="text" id="baby-name" name="baby-name" value="Sam" disabled>
+              </div>
+              <div class="profile-group">
+                <label for="baby-age">Baby's Age</label>
+                <input type="text" id="baby-age" name="baby-age" value="6 months" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Settings Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Device Settings</h2>
+          <button id="refresh-device" class="btn-icon">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="device-info">
+            <div class="info-group">
+              <span class="info-label">Device Name</span>
+              <span class="info-value">CryCare-83A4</span>
+              <button class="btn-icon-small" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Last Connected</span>
+              <span class="info-value">May 15, 2025 - 3:42 PM</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Firmware Version</span>
+              <span class="info-value">v1.2.5</span>
+              <button class="btn-primary-small">Update</button>
+            </div>
+            <div class="info-group">
+              <span class="info-label">WiFi Network</span>
+              <span class="info-value">Home_Network</span>
+              <button class="btn-icon-small" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+            <div class="info-group">
+              <span class="info-label">MAC Address</span>
+              <span class="info-value">5C:CF:7F:83:A4:B2</span>
+            </div>
+            <div class="info-group">
+              <span class="info-label">Reset Device</span>
+              <button class="btn-danger-small">Factory Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Settings Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Notification Settings</h2>
+          <button id="save-notifications" class="btn-primary">
+            Save Changes
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="settings-section">
+            <h3>Alert Preferences</h3>
+            <div class="setting-group">
+              <div class="setting-name">Push Notifications</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="push-notifications" checked>
+                <label for="push-notifications"></label>
+              </div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-name">Email Alerts</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="email-alerts">
+                <label for="email-alerts"></label>
+              </div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-name">Sound Alerts</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="sound-alerts" checked>
+                <label for="sound-alerts"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Alert Types</h3>
+            <div class="setting-group">
+              <div class="setting-name">Hunger Cries</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="hunger-alerts" checked>
+                <label for="hunger-alerts"></label>
+              </div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-name">Sleepiness Cries</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="sleep-alerts" checked>
+                <label for="sleep-alerts"></label>
+              </div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-name">Discomfort Cries</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="discomfort-alerts" checked>
+                <label for="discomfort-alerts"></label>
+              </div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-name">Unknown Cries</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="unknown-alerts" checked>
+                <label for="unknown-alerts"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Quiet Hours</h3>
+            <div class="setting-group">
+              <div class="setting-name">Enable Quiet Hours</div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="quiet-hours">
+                <label for="quiet-hours"></label>
+              </div>
+            </div>
+            <div class="time-range" id="quiet-hours-range" style="display: none;">
+              <div class="time-input">
+                <label for="quiet-start">From</label>
+                <input type="time" id="quiet-start" name="quiet-start" value="22:00">
+              </div>
+              <div class="time-input">
+                <label for="quiet-end">To</label>
+                <input type="time" id="quiet-end" name="quiet-end" value="06:00">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+</html>

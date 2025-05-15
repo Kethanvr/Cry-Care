@@ -4,6 +4,7 @@ import json
 from flask_cors import CORS  # Importing CORS
 from flask_socketio import SocketIO  # Import SocketIO for real-time communication
 import random  # Add this for test data
+from datetime import datetime  # Import datetime for timestamps
 
 app = Flask(__name__)
 
@@ -32,6 +33,16 @@ def chrome_devtools():
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+# Route for history page
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
+# Route for settings page
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
 
 # Route for home page
 @app.route('/')
@@ -157,6 +168,256 @@ def baby_status():
 @app.route('/get-latest-status')
 def get_latest_status():
     return jsonify(latest_status)
+
+# Store cry history records
+cry_history = []
+
+@app.route('/record-cry', methods=['POST'])
+def record_cry():
+    """Record a cry event in the history"""
+    try:
+        data = request.get_json()
+        timestamp = data.get('timestamp', None) or datetime.now().isoformat()
+        
+        # Create history record
+        record = {
+            'id': len(cry_history) + 1,
+            'status': data.get('status', ''),
+            'situation': data.get('situation', ''),
+            'recommendation': data.get('recommendation', ''),
+            'timestamp': timestamp,
+            'viewed': False
+        }
+        
+        cry_history.append(record)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Cry event recorded',
+            'record': record
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/get-history', methods=['GET'])
+def get_history():
+    """Get cry history with optional date filtering"""
+    try:
+        # Get query parameters for filtering
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        limit = int(request.args.get('limit', 10))
+        
+        filtered_history = cry_history
+        
+        # Apply date filtering if provided
+        if start_date and end_date:
+            filtered_history = [
+                record for record in cry_history
+                if start_date <= record['timestamp'].split('T')[0] <= end_date
+            ]
+        
+        # Sort by timestamp (newest first)
+        sorted_history = sorted(
+            filtered_history, 
+            key=lambda x: x['timestamp'], 
+            reverse=True
+        )
+        
+        # Apply limit
+        limited_history = sorted_history[:limit]
+        
+        # Calculate summary stats
+        cry_types = {}
+        for record in filtered_history:
+            status = record['status'].lower()
+            
+            if 'hungry' in status or 'hunger' in status:
+                category = 'hunger'
+            elif 'sleep' in status or 'tired' in status:
+                category = 'sleepiness'
+            elif 'discomfort' in status or 'pain' in status or 'diaper' in status:
+                category = 'discomfort'
+            else:
+                category = 'other'
+                
+            cry_types[category] = cry_types.get(category, 0) + 1
+        
+        return jsonify({
+            'success': True,
+            'history': limited_history,
+            'total': len(filtered_history),
+            'summary': {
+                'total': len(filtered_history),
+                'byType': cry_types
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/get-history-stats', methods=['GET'])
+def get_history_stats():
+    """Get statistical breakdown of cry history by month and week"""
+    try:
+        # Get query parameters
+        month = request.args.get('month', datetime.now().strftime('%Y-%m'))
+        
+        # Filter records for the requested month
+        month_start = f"{month}-01"
+        if month.split('-')[1] == '12':
+            next_year = str(int(month.split('-')[0]) + 1)
+            next_month = f"{next_year}-01-01"
+        else:
+            next_month_num = str(int(month.split('-')[1]) + 1).zfill(2)
+            next_month = f"{month.split('-')[0]}-{next_month_num}-01"
+        
+        month_records = [
+            record for record in cry_history
+            if month_start <= record['timestamp'].split('T')[0] < next_month
+        ]
+        
+        # Group by week within the month
+        weeks_data = {
+            'week1': [],
+            'week2': [],
+            'week3': [],
+            'week4': []
+        }
+        
+        for record in month_records:
+            day = int(record['timestamp'].split('T')[0].split('-')[2])
+            
+            if day <= 7:
+                weeks_data['week1'].append(record)
+            elif day <= 14:
+                weeks_data['week2'].append(record)
+            elif day <= 21:
+                weeks_data['week3'].append(record)
+            else:
+                weeks_data['week4'].append(record)
+        
+        # Calculate stats for each week
+        stats = {
+            'total': len(month_records),
+            'weeks': {}
+        }
+        
+        for week, records in weeks_data.items():
+            week_stats = {'total': len(records), 'byType': {}}
+            
+            for record in records:
+                status = record['status'].lower()
+                
+                if 'hungry' in status or 'hunger' in status:
+                    category = 'hunger'
+                elif 'sleep' in status or 'tired' in status:
+                    category = 'sleepiness'
+                elif 'discomfort' in status or 'pain' in status or 'diaper' in status:
+                    category = 'discomfort'
+                else:
+                    category = 'other'
+                    
+                week_stats['byType'][category] = week_stats['byType'].get(category, 0) + 1
+            
+            stats['weeks'][week] = week_stats
+        
+        return jsonify({
+            'success': True,
+            'month': month,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# User settings
+user_settings = {
+    'profile': {
+        'name': 'Alex Johnson',
+        'email': 'alex@example.com',
+        'phone': '+1 (555) 123-4567',
+        'babyName': 'Sam',
+        'babyAge': '6 months'
+    },
+    'notifications': {
+        'push': True,
+        'email': False,
+        'sound': True,
+        'alertTypes': {
+            'hunger': True,
+            'sleepiness': True,
+            'discomfort': True,
+            'unknown': True
+        },
+        'quietHours': {
+            'enabled': False,
+            'start': '22:00',
+            'end': '06:00'
+        }
+    },
+    'device': {
+        'name': 'CryCare-83A4',
+        'lastConnected': '2025-05-15T15:42:00',
+        'firmwareVersion': 'v1.2.5',
+        'wifiNetwork': 'Home_Network',
+        'macAddress': '5C:CF:7F:83:A4:B2'
+    }
+}
+
+@app.route('/get-user-settings', methods=['GET'])
+def get_user_settings():
+    """Get user settings"""
+    return jsonify(user_settings)
+
+@app.route('/update-user-settings', methods=['POST'])
+def update_user_settings():
+    """Update user settings"""
+    try:
+        data = request.get_json()
+        
+        # Update profile if provided
+        if 'profile' in data:
+            user_settings['profile'].update(data['profile'])
+            
+        # Update notifications if provided
+        if 'notifications' in data:
+            # Handle nested objects
+            if 'alertTypes' in data['notifications']:
+                user_settings['notifications']['alertTypes'].update(data['notifications']['alertTypes'])
+                del data['notifications']['alertTypes']
+                
+            if 'quietHours' in data['notifications']:
+                user_settings['notifications']['quietHours'].update(data['notifications']['quietHours'])
+                del data['notifications']['quietHours']
+                
+            user_settings['notifications'].update(data['notifications'])
+            
+        # Update device if provided
+        if 'device' in data:
+            user_settings['device'].update(data['device'])
+        
+        return jsonify({
+            'success': True,
+            'message': 'Settings updated successfully',
+            'settings': user_settings
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/test-update', methods=['GET'])
 def test_update():

@@ -184,13 +184,43 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       adviceElement.innerHTML = 'No advice available.';
     }
-      // Update timestamp
+    
+    // Update timestamp
     if (lastUpdateElement) {
       const now = new Date();
       const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const formattedDate = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
       lastUpdateElement.textContent = `Last updated: ${formattedDate} at ${formattedTime}`;
     }
+    
+    // Record this status in the history
+    recordCryHistory(data);
+  }
+  
+  // Record cry event in history
+  function recordCryHistory(data) {
+    // Don't record empty status
+    if (!data.status || !data.situation) return;
+    
+    fetch('/record-cry', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: data.status,
+        situation: data.situation,
+        recommendation: data.recommendation,
+        timestamp: new Date().toISOString()
+      })
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('Cry event recorded:', result);
+    })
+    .catch(error => {
+      console.error('Error recording cry event:', error);
+    });
   }
   
   function updateStatusIndicator(isOnline) {
