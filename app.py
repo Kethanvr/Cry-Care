@@ -34,6 +34,11 @@ def chrome_devtools():
 def dashboard():
     return render_template('dashboard.html')
 
+# Route for response page
+@app.route('/response')
+def response_page():
+    return render_template('response.html', current_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
 # Route for history page
 @app.route('/history')
 def history():
@@ -107,6 +112,10 @@ def chat():
 def baby_status():
     data = request.get_json()
     status = data.get("status", "").strip()
+    
+    # Add the device IP to the data (for display in Response page)
+    data['ip'] = request.remote_addr
+    data['timestamp'] = datetime.now().isoformat()
 
     print(f"📥 Status received: {status}")
 
@@ -134,27 +143,34 @@ def baby_status():
 
         # Print raw response for debugging
         print("🧠 Raw Gemini response:")
-        print(response.text)
-
-        # Attempt to parse the response as JSON
+        print(response.text)        # Attempt to parse the response as JSON
         advice_json = json.loads(response.text)
         
         # Log the parsed response for debugging
         print("✅ Parsed JSON:", advice_json)
-
+        
         # Prepare the response
         response_data = {
             "status": status,
             "situation": advice_json.get("situation", ""),
-            "recommendation": advice_json.get("recommendations", [])[0] if advice_json.get("recommendations") else ""
+            "recommendation": advice_json.get("recommendations", [])[0] if advice_json.get("recommendations") else "",
+            "ip": request.remote_addr,
+            "timestamp": datetime.now().isoformat()
         }
         
         # Store the latest status
-        global latest_status
+        global latest_status, hardware_data_log
         latest_status = response_data
+        
+        # Add to hardware data log
+        hardware_data_log.append(response_data)
+        # Keep log at a reasonable size
+        if len(hardware_data_log) > 100:
+            hardware_data_log = hardware_data_log[-100:]
         
         # Emit the data to all connected clients via Socket.IO
         socketio.emit('status_update', response_data)
+        socketio.emit('hardware_data', response_data)  # Send to Response page
         
         return jsonify(response_data)
 
@@ -448,24 +464,76 @@ def test_update():
     try:
         response = model.generate_content(prompt)
         advice_json = json.loads(response.text)
-        
         response_data = {
             "status": status,
             "situation": advice_json.get("situation", ""),
-            "recommendation": advice_json.get("recommendations", [])[0] if advice_json.get("recommendations") else ""
+            "recommendation": advice_json.get("recommendations", [])[0] if advice_json.get("recommendations") else "",
+            "ip": request.remote_addr,
+            "timestamp": datetime.now().isoformat()
         }
         
         # Update latest status
-        global latest_status
+        global latest_status, hardware_data_log
         latest_status = response_data
+        
+        # Add to hardware data log
+        hardware_data_log.append(response_data)
+        # Keep log at a reasonable size
+        if len(hardware_data_log) > 100:
+            hardware_data_log = hardware_data_log[-100:]
         
         # Emit through Socket.IO
         socketio.emit('status_update', response_data)
+        socketio.emit('hardware_data', response_data)  # Send to Response page
         
         return jsonify({"message": "Test update sent successfully", "data": response_data})
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Keep track of hardware data
+hardware_data_log = []
+
+# Socket.IO event handlers
+@socketio.on('connect')
+def handle_connect():
+    print(f"Client connected: {request.sid}")
+    socketio.emit('connection_status', {'status': 'connected'}, room=request.sid)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"Client disconnected: {request.sid}")
+
+@socketio.on('get_hardware_status')
+def handle_get_hardware_status():
+    # Send the latest status to the client
+    socketio.emit('hardware_data', latest_status, room=request.sid)
+    
+    # Send recent hardware data logs if available
+    if hardware_data_log:
+        for log_entry in hardware_data_log[-10:]:  # Send last 10 entries
+            socketio.emit('hardware_data', log_entry, room=request.sid)
+
+@app.route('/get-hardware-logs', methods=['GET'])
+def get_hardware_logs():
+    """Get hardware data logs"""
+    try:
+        limit = int(request.args.get('limit', 50))  # Default to last 50 entries
+        
+        # Return hardware logs (newest first)
+        logs = list(reversed(hardware_data_log[-limit:]))
+        
+        return jsonify({
+            'success': True,
+            'logs': logs,
+            'total': len(hardware_data_log)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=3000, debug=True, allow_unsafe_werkzeug=True)

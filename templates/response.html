@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryCare - Hardware Response</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/response.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <span class="logo-text">👶 BabyCry</span>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="/" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="/dashboard" class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/response" class="nav-item active">
+        <i class="fas fa-reply"></i>
+        <span>Response</span>
+      </a>
+      <a href="/chat" class="nav-item">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+      </a>
+      <a href="/history" class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </a>
+      <a href="/settings" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="flex items-center">
+        <button id="mobile-menu-toggle" class="md:hidden mr-4 text-primary">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1>Hardware Response</h1>
+      </div>
+      <div class="status">
+        <span id="status-indicator" class="status-indicator online"></span>
+        <span>Device Status</span>
+      </div>
+    </div>
+    
+    <div class="response-container">
+      <div class="card">
+        <div class="card-header">
+          <h2>Live Hardware Data</h2>
+          <div class="card-actions">
+            <button id="clear-logs" class="btn btn-outline">
+              <i class="fas fa-eraser"></i> Clear Logs
+            </button>
+            <button id="auto-scroll" class="btn btn-primary active">
+              <i class="fas fa-scroll"></i> Auto-Scroll
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="response-feed" class="response-feed">
+            <div class="response-message system">
+              <span class="timestamp">{{ current_time }}</span>
+              <span class="message">System initialized. Waiting for hardware data...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2>Connection Details</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Device IP</div>
+              <div id="device-ip" class="info-value">Waiting for connection...</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Last Connection</div>
+              <div id="last-connection" class="info-value">--</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Messages Received</div>
+              <div id="messages-count" class="info-value">0</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Signal Strength</div>
+              <div id="signal-strength" class="info-value">
+                <div class="signal-bars">
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+                  <div class="bar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Socket.IO library -->
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='js/response.js') }}"></script>
+</body>
+</html>
