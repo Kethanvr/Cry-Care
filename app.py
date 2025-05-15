@@ -24,9 +24,33 @@ latest_status = {
     "recommendation": ""
 }
 
+@app.route('/.well-known/appspecific/com.chrome.devtools.json')
+def chrome_devtools():
+    return jsonify({})
+
+# Route for dashboard page
 @app.route('/')
-def home():
-    return render_template('index.html')
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    message = data.get("message", "").strip()
+    
+    try:
+        # Use Gemini to generate a response
+        prompt = (
+            f"You are an AI baby care assistant. Your job is to provide helpful, friendly, and nurturing advice to parents.\n"
+            f"The user's message is: '{message}'\n"
+            f"Respond in a warm, supportive tone as if you're an experienced caregiver, but keep your response fairly brief (1-3 sentences)."
+        )
+        
+        response = model.generate_content(prompt)
+        return jsonify({"response": response.text})
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({"response": "I'm sorry, I couldn't process your request. Please try again."}), 500
 
 @app.route('/baby-status', methods=['POST'])
 def baby_status():

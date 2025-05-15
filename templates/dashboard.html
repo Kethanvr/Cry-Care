@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryCare - Dashboard</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <span class="logo-text">👶 BabyCry</span>
+      </div>
+    </div>
+      <nav class="nav-links">
+      <a href="/" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item active">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>      <a href="#" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Analytics</span>
+      </a>
+      <a href="#" class="nav-item" id="chat-nav-item">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </aside>
+    <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="flex items-center">
+        <button id="mobile-menu-toggle" class="md:hidden mr-4 text-primary">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="status">
+        <span id="status-indicator" class="status-indicator online"></span>
+        <span>Device Status</span>
+      </div>
+    </div>
+    
+    <div class="dashboard-cards">
+      <!-- Baby Status Card -->
+      <div class="card situation-card">
+        <div class="card-header">
+          <h2>Baby Status</h2>
+          <button id="test-button" class="bg-white text-primary hover:bg-primary-light py-1 px-3 rounded text-sm">
+            Test Update
+          </button>
+        </div>
+        <div class="card-body">
+          <h3>Current Situation</h3>
+          <p id="situation" class="text-lg mb-4">Loading baby status...</p>
+          
+          <h3>Recommendation</h3>
+          <div class="recommendations">
+            <p id="advice">Loading advice...</p>
+          </div>
+          
+          <div id="last-update" class="timestamp">Last updated: --</div>
+        </div>
+      </div>
+      
+      <!-- Chatbot Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Baby Care Assistant</h2>
+        </div>
+        <div class="card-body p-0">
+          <div class="chat-container">
+            <div id="chat-messages" class="chat-messages">
+              <div class="message bot">
+                Hello! I'm your baby care assistant. How can I help you today?
+              </div>
+            </div>
+            
+            <form id="chat-form" class="chat-input">
+              <input 
+                type="text" 
+                id="chat-input" 
+                placeholder="Type your question here..." 
+                autocomplete="off"
+              >
+              <button type="submit">
+                <i class="fas fa-paper-plane"></i> Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>    </div>
+  </main>
+  
+  <!-- Socket.IO library -->
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
