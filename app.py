@@ -4,6 +4,7 @@ import json
 from flask_cors import CORS  # Importing CORS
 from flask_socketio import SocketIO  # Import SocketIO for real-time communication
 import random  # Add this for test data
+import os
 from datetime import datetime  # Import datetime for timestamps
 
 app = Flask(__name__)
@@ -15,7 +16,10 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Configure Gemini API
-genai.configure(api_key="AIzaSyCp4BG3Rrt7LpVqCCUIJD8fkKv_9S10V1M")
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY must be set in the server environment")
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Keep track of the latest status

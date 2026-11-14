@@ -12,3 +12,7 @@ CryCare is an experimental infant-monitoring prototype with a Flask web interfac
 This repository is a prototype, not a medical device. It cannot diagnose an infant or replace advice from a qualified clinician. Do not use its output to make care decisions.
 
 Before running or deploying it, review credential handling and replace any exposed credentials. Do not put keys in README files, source control, or public examples.
+
+## Gemini configuration
+
+Set `GEMINI_API_KEY` in the server process environment before starting the Flask app. The application stops at startup when the variable is missing. Rotate any key previously committed to this repository.
